@@ -1,7 +1,8 @@
-{may, when_, Obj: {get, set, let_}} = require \glad-functions
-document ?= {}
+{dist, lazy, may, when_, Obj: {get, set, let_}} = require \glad-functions
 
 module.exports = new class Domf
+  lazy_doc = lazy get, \document, global
+  with_doc = apply >> (<< (dist _, [lazy_doc, id]))
   on_: on_ = (event, handler, elm)-->
     let_ elm, \addEventListener, event, handler
   parent: parent = get \parentNode
