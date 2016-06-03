@@ -114,7 +114,7 @@ Add the other element in the element itself.
 ```livescript
 document
 |> query \#foo
-|> append (_create  \p)
+|> append (create  \p)
 ```
 #### select
 Give all text in the text box selected.
