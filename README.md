@@ -19,14 +19,14 @@ Get parent nodes (up to root element, in most cases, to "html" element.).
 ```livescript
 document
 |> query \#foo
-|> parents #=> [node, node, ...]
+|> parents #=> [elem, elem, ...]
 ```
 #### children
 Get child nodes.
 ```livescript
 document
 |> query \#foo
-|> children #=> [node, node, ...]
+|> children #=> [elem, elem, ...]
 ```
 #### classes
 Get classes of the element.
@@ -57,16 +57,16 @@ document
 |> remove_class \bar
 ```
 #### query
-Get the first element on which matches the selector(s).
+Get the first element on which matches the selector.
 ```livescript
 document
-|> query \h1, \#foo #=> elem
+|> query \#foo #=> elem
 ```
 #### query_all
-Get all of elements on which matches the selector(s).
+Get all of elements on which matches the selector.
 ```livescript
 document
-|> query_all \.foo
+|> query_all \.foo #=> [elem, elem, ...]
 ```
 #### create
 Create the HTML element.

@@ -5,6 +5,7 @@ doc = jsdom "
 <h1 style=\"color:#000;\">
 helloworld
 </h1>
+<h2>This is 1st h2</h2>
 <div id=\"test-top\" class=\"test-class\">
   <div id=\"test-second\" class=\"test-class-second\">
   test-second-content
@@ -30,6 +31,9 @@ helloworld
     </div>
   </div>
 </div>
+<div id=\"test-empty\" >
+</div>
+<h2 class=\"testsecond\" >This is 2nd h2</h2>
 
 "
 global.window = doc.defaultView;

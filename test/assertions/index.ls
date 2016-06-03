@@ -25,17 +25,31 @@ module.exports = new class DomfAssertion
         |> parent
         |> get \id
         |> equal _, \test-top
+     (parent)->
+        document
+        |> _query \BODY
+        |> parent
+        |> (.tagName)
+        |> equal _, \HTML
   parents: parents =
     * (parents)->
         document
         |> _query \#test-third-layer
         |> parents
-        |> take 2
         |> map get \id
         |> zip-with $, [(is \test-second-layer), (is \test-top-layer)]
         |> filter (is true)
         |> (.length)
         |> equal _, 2
+    * (parents)->
+        document
+        |> _query \#test-third-layer
+        |> parents
+        |> map get \tagName
+        |> zip-with $, [(is \DIV), (is \DIV), (is \BODY), (is \HTML)]
+        |> filter (is true)
+        |> (.length)
+        |> equal _, 4
   children: children =
      (children)->
         document
@@ -124,9 +138,9 @@ module.exports = new class DomfAssertion
         |> equal _, \test-second-content
      * (query)->
         document
-        |> query \h1
+        |> query \h2
         |> _html
-        |> equal _, \helloworld
+        |> equal _, "This is 1st h2"
      * (query)->
         document
         |> query \#test-second-not-exists
@@ -182,11 +196,12 @@ module.exports = new class DomfAssertion
         |> style
         |> (.item 0)
         |> equal _, \color
+     * (style)->
         document
-        |> _query \h1
+        |> _query \#test-top-text
         |> style
-        |> (.cssText)
-        |> equal _, 'color: rgb(0, 0, 0);'
+        |> (.length)
+        |> equal _, 0
   set_style: set_style =
     * (set_style)->
         document
@@ -259,6 +274,11 @@ module.exports = new class DomfAssertion
         |> _query \#test-second
         |> html
         |> equal _, \test-second-content
+    * (html)->
+        document
+        |> _query \#test-empty
+        |> html
+        |> equal _, ""
   set_html: set_html =
     * (set_html)->
         document
