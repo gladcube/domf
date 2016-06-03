@@ -94,6 +94,7 @@ document
 #### style
 Get style value.
 ```livescript
+document
 |> query \#foo
 |> style
 ```
