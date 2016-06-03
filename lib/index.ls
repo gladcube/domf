@@ -29,6 +29,7 @@ module.exports = new class Domf
   append_to: append_to = let_ _, \appendChild, _
   append: append = flip (let_ _, \appendChild, _)
   select: let_ _, \select
+  focus: let_ _, \focus
   blur: let_ _, \blur
   text: text = get \textContent
   set_text: set_text = (set \textContent)
