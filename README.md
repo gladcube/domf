@@ -38,6 +38,7 @@ document
 #### has_class
 Detect if element has the class,or not.
 ```livescript
+document
 |> query \#foo
 |> has_class \bar #=> true or false
 ```
