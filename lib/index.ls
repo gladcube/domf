@@ -19,7 +19,8 @@ module.exports = new class Domf
     classes e |> let_ _, \remove, c
   query: flip (let_ _, \querySelector, _)
   query_all: flip (let_ _, \querySelectorAll, _)
-  create: let_ document, \createElement, _
+  create: create = (c, e) -->
+    let_ e, \createElement, c
   attr: flip (let_ _, \getAttribute, _)
   set_attr: (k, v, e)-->
     let_ e, \setAttribute, k, v
