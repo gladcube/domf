@@ -6,18 +6,24 @@ Add eventlistener.
 [HTML]
 ```HTML
 <div id="foo-top" class="foo-class">
-  <form name="test-form">
-  <input type="text" name="test-input-text" value="test">
-  <input type="button" name="test-input-button" value="this is test button">
+  <form name="foo-form">
+  <input type="text" name="foo-input-text" value="foo">
+  <input type="button" name="foo-input-button" value="this is foo button">
   </form>
 </div>
 ```
 
 [LiveScript]
 ```livescript
-query "input[name='input-button']" document
-|> on_ "click", -> @value = "button pushed"
+query "input[name='foo-input-button']" document
+|> on_ \click, -> @value = "button pushed"
 ```
+[LiveScript] (With no lambda using glad-functions. Equivalent to the below. )
+```livescript
+query "input[name='foo-input-button']" document
+|> (withl lazy set, \value, "button pushed", _ ) >> (apply on_ \click)
+```
+
 #### parent
 Get parent node (up to 1 hierarchy).
 

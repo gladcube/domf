@@ -1,11 +1,11 @@
 {throws, does-not-throw, equal, ok, deep-equal, not-deep-equal} = require \assert
-{case$, catch_, dist, $, $$, act, withr, withl, $_at, lazy, Obj: {get, set, let_}} = require \glad-functions
+{case$, catch_, dist, $, $$, act, withl, $_at, lazy, lazyhoge, Obj: {get, set, let_}} = require \glad-functions
 {query: _query, classes: _classes, html: _html, add_class: _add_class, attr: _attr, outer_html: _outer_html, text: _text, create: _create, style: _style, focus: _focus, append_to: _append_to, append: _append} = require \../../lib/index.ls
 module.exports = new class DomfAssertion
   on_: on_ =
     * (on_)->
         _query "input[name='test-input-button']" document
-        |> act on_ \click, (-> @value = "test button pushed")
+        |> act (withl lazy set, \value, "test button pushed", _) >> (apply on_ \click)
         |> act (.click!)
         |> (get \value) >> (equal _, "test button pushed")
   parent: parent =
