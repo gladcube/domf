@@ -1,153 +1,175 @@
-{throws, does-not-throw, equal, ok, deep-equal, not-deep-equal} = require \assert
+{throws, does-not-throw, equal, not-equal, ok, deep-equal, not-deep-equal} = require \assert
 {case$, catch_, dist, $, $$, act, withl, $_at, lazy, lazyhoge, Obj: {get, set, let_}} = require \glad-functions
-{query: _query, classes: _classes, html: _html, add_class: _add_class, attr: _attr, outer_html: _outer_html, text: _text, create: _create, style: _style, focus: _focus, append_to: _append_to, append: _append} = require \../../lib/index.ls
+{query: _query, classes: _classes, html: _html, add_class: _add_class, attr: _attr, outer_html: _outer_html, text: _text, create: _create, style: _style, focus: _focus, append_to: _append_to, append: _append, tag_name: _tag_name, on_:_on_, id: id_} = require \../../lib/index.ls
 module.exports = new class DomfAssertion
   on_: on_ =
-    * (on_)->
+      (on_, document)->
         _query "input[name='test-input-button']" document
         |> act (withl lazy set, \value, "test button pushed", _) >> (apply on_ \click)
-        |> act (.click!)
+        |> act (let_ _, \click)
         |> (get \value) >> (equal _, "test button pushed")
   parent: parent =
-     (parent)->
+      (parent, document)->
         _query \BODY, document
-        |> parent >> (get \tagName) >> (equal _, \HTML)
+        |> parent >> _tag_name >> (equal _, \HTML)
   parents: parents =
-    * (parents)->
+      (parents, document)->
         _query \#test-third-layer, document
-        |> parents >> (map get \id) >> (deep-equal _, [\test-second-layer \test-top-layer "" "" undefined])
+        |> parents |> (deep-equal _, (map (_query _, document ), [
+          \#test-second-layer
+          \#test-top-layer
+          \body
+          \html
+        ]) ++ document)
   children: children =
-     (children)->
+      (children, document)->
         _query \#test-top, document
-        |> children >> (map get \id) >> (deep-equal _, <[test-second test-second-next]>)
-     (children)->
+        |> children >> (map id_) >> (deep-equal _, <[test-second test-second-next]>)
+      (children, document)->
         _query \#test-second, document
-        |> children >> (map get \id) >> (deep-equal _, [undefined])
+        |> children >> (map id_) >> (deep-equal _, [undefined])
   classes: classes =
-     (classes)->
+     (classes, document)->
         <[#test-second #test-second-next]>
-        |> map (_query _,document) >> classes
-        |> act $_at 0, ( deep-equal _, <[test-class-second]>)
-        |> act $_at 1, ( deep-equal _, <[test-class-second test-class-sub]>)
+        |> map (_query _, document) >> classes
+        |> zip-with deep-equal, [<[test-class-second]> <[test-class-second test-class-sub]>]
   has_class: has_class =
-     (has_class)->
+      (has_class, document)->
         _query \#test-second, document
-        |> act (has_class \test-class-second) >> (equal _, true)
-     (has_class)->
+        |> (has_class \test-class-second) >> (equal _, true)
+      (has_class, document)->
         _query \#test-second, document
-        |> act (has_class \test-class-second-not-exists) >> (equal _, false)
+        |> (has_class \test-class-second-not-exists) >> (equal _, false)
   add_class: add_class =
-     (add_class)->
+      (add_class, document)->
         _query \#test-second, document
         |> act add_class \test-class-third-class
-        |> act _classes >> (.contains \test-class-third-class) >> (equal _, true)
+        |> _classes >> (\test-class-third-class in) >> (equal _, true)
   remove_class: remove_class =
-    * (remove_class)->
+      (remove_class, document)->
         _query \#test-second, document
-        |> act _add_class \test-class-added
-        |> act _classes >> (.contains \test-class-added) >> (equal _, true)
-        |> act remove_class \test-class-added
-        |> act _classes >> (.contains \test-class-added) >> (equal _, false)
+        |> $$ [
+           _add_class \test-class-added
+           _classes >> (.contains \test-class-added) >> (equal _, true)
+           remove_class \test-class-added
+           _classes >> (.contains \test-class-added) >> (equal _, false)
+        ]
   query: query =
-    * (query)->
+      (query, document)->
         <[#test-second h2]>
-        |> (map query _, document) >> (map _html)
+        |> map (query _, document) >> _html
         |> deep-equal _, [ "test-second-content", "This is 1st h2" ]
-    * (query)->
+      (query, document)->
         query \#test-second-not-exists, document
         |> equal _, null
   query_all: query_all =
-     * (query_all)->
+      (query_all, document)->
         query_all \.test-class-second, document
         |> (map _html) >> (deep-equal _, <[test-second-content test-second-next-content]>)
-     * (query_all)->
+      (query_all, document)->
         query_all \.test-class-second-not-exists, document
-        |> (map _html) >> (not-deep-equal _, <[test-second-content test-second-next-content]>)
+        |> (get \length) >> equal _, 0
   create: create =
-       (create)->
+      (create, document)->
         _query \#test-third-layer, document
         |> act _append (create \div, document)
         |> _html >> (equal _, \<div></div>)
   attr: attr =
-      (attr)->
+      (attr, document)->
         _query \#test-top document
         |> $$ [(attr \class), (attr \rel)] >> (deep-equal _, [\test-class null])
   set_attr: set_attr =
-     * (set_attr)->
+      (set_attr, document)->
         _query \#test-top document
-        |> act set_attr \rel \test-rel
+        |> set_attr \rel \test-rel
         |> (_attr \rel) >> (equal _, \test-rel)
   style: style =
-     * (style)->
+      (style, document)->
         _query \h1, document
-        |> style >> (.item 0) >> (equal _, \color)
-     * (style)->
+        |> style \color >> (equal _, "rgb(0, 0, 0)")
+      (style, document)->
         _query \#test-top-text, document
         |> style >> (get \length) >> (equal _, 0)
   set_style: set_style =
-    * (set_style)->
+      (set_style, document)->
         _query \h1 document
-        |> act set_style \text-decoration \underline
-        |> _style >> (get \text-decoration) >> (equal _, \underline)
+        |> set_style \text-decoration \underline
+        |> (_style \text-decoration) >> (equal _, \underline)
   append_to: append_to =
-    * (append_to)->
-        _create \div, document
-        |> append_to  _query \#test-top-second document
+      (append_to, document)->
         _query \#test-top-second document
+        |> act append_to _, (_create \div, document)
         |> _html >> (equal _, \<div></div>)
   append: append =
-    * (append)->
+      (append, document)->
         _query \#test-top-third document
         |> act append (_create \p document)
         |> _html >> (equal _, \<p></p>)
   select: select =
-     * (select)->
+      (select, document)->
         ok false, "it\'s not testable"
   focus: focus =
-     * (focus)->
-        document.activeElement.tagName |> equal _, \BODY
-        _query "input[name='test-input-text']" document |> focus
-        document.activeElement.tagName |> equal _, \INPUT
+      (focus, document)->
+        _query "input[name='test-input-text']" document
+        |> $$ [
+            (withl lazy set, \value, "focused", _) >> (apply _on_ \focus)
+            (get \value) >> (equal _, "test")
+            focus
+            (get \value) >> (equal _, "focused")
+        ]
   blur: blur =
-     * (blur)->
-        _query "input[name='test-input-text']" document |> _focus
-        document.activeElement.name |> equal _, \test-input-text
-        _query "input[name='test-input-text']" document |> blur
-        document.activeElement.name |> equal _, undefined
+      (blur, document)->
+        _query "input[name='test-input-text']" document
+        |> $$ [
+            (withl lazy set, \value, "blured", _) >> (apply _on_ \blur)
+            (get \value) >> (equal _, "test")
+            _focus
+            (get \value) >> (equal _, "test")
+            blur
+            (get \value) >> (equal _, "blured")
+        ]
   text: text =
-    * (text)->
+      (text, document)->
         _query \#test-top-text document
         |> text >> (equal _, "This text is for test only　日本語でも")
   set_text: set_text =
-    * (set_text)->
+      (set_text, document)->
         _query \#test-top-text document
         |> act set_text "This text is added by test"
         |> _text >> (equal _, "This text is added by test")
   html: html =
-    * (html)->
+      (html, document)->
         _query \#test-second document
         |> html >> (equal _, \test-second-content)
-    * (html)->
+      (html, document)->
         _query \#test-empty document
         |> html >> (equal _, "")
   set_html: set_html =
-    * (set_html)->
+      (set_html, document)->
         _query \#test-second document
         |> act set_html "<p>this is test paragraph</p>"
         |> _html >> (equal _, "<p>this is test paragraph</p>")
   outer_html: outer_html =
-    * (outer_html)->
+      (outer_html, document)->
         _query \#test-second-next document
         |> outer_html >> (equal _, "<div id=\"test-second-next\" class=\"test-class-second test-class-sub\">
           test-second-next-content
           </div>")
   set_outer_html: set_outer_html =
-    * (set_outer_html)->
+      (set_outer_html, document)->
         _query \#test-second-next document
-        |> set_outer_html "<div id=\"test-second-next\">
+        |> act set_outer_html "<div id=\"test-second-next-rewritten\">
           test-set-alternatvie-content
           </div>"
-        _query \#test-second-next document
-        |> _outer_html >> (equal _, "<div id=\"test-second-next\">
+        _query \#test-second-next-rewritten document
+        |> _outer_html >> (equal _, "<div id=\"test-second-next-rewritten\">
           test-set-alternatvie-content
           </div>")
+  tag_name: tag_name =
+      (tag_name, document)->
+        _query \#test-top document
+        |> tag_name >> (equal _, \DIV)
+  id: id =
+      (id, document)->
+        _query \#test-top document
+        |> id >> (equal _, \test-top)

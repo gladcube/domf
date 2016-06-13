@@ -1,5 +1,4 @@
-{dist, lazy, may, when_, Obj: {get, set, let_}} = require \glad-functions
-
+{dist, lazy, may, when_, act, I, Obj: {get, set, let_}} = require \glad-functions
 module.exports = new class Domf
   lazy_doc = lazy get, \document, global
   with_doc = apply >> (<< (dist _, [lazy_doc, id]))
@@ -9,7 +8,7 @@ module.exports = new class Domf
   parents: parents = (elm)->
     | (parent elm)? => [that] ++ parents that
     | _ => []
-  children: children = (get \childNodes) >> map id
+  children: children = (get \childNodes) >> map I
   classes: classes = (get \classList) >> (or [])
   has_class: has_class = (name, elm)-->
     name in (classes elm)
@@ -23,10 +22,11 @@ module.exports = new class Domf
     let_ e, \createElement, c
   attr: flip (let_ _, \getAttribute, _)
   set_attr: (k, v, e)-->
-    let_ e, \setAttribute, k, v
-  style: style = get \style
+    e |> act let_ _, \setAttribute, k, v
+  style: style = (k, e)-->
+    e |> (get \style) >> (get k)
   set_style: set_style = (k, v, e)-->
-    style e |> set k, v
+    e |> act (get \style) >> (set k, v)
   append_to: append_to = let_ _, \appendChild, _
   append: append = flip (let_ _, \appendChild, _)
   select: let_ _, \select
@@ -38,3 +38,5 @@ module.exports = new class Domf
   set_html: set_html = set \innerHTML
   outer_html: outer_html = get \outerHTML
   set_outer_html: set_outer_html = set \outerHTML
+  tag_name: tag_name = get \tagName
+  id: id = get \id

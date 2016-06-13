@@ -46,7 +46,7 @@ query \#foo-third-layer document
 |> parent #=> elem(#foo-second-layer)
 ```
 #### parents
-Get parent nodes (up to root element, in most cases, to "html" element.).
+Get parent nodes (up to the "document" as root, over "html" element.)
 
 [HTML]
 ```HTML
@@ -64,7 +64,7 @@ Get parent nodes (up to root element, in most cases, to "html" element.).
 [LiveScript]
 ```livescript
 query \#foo-third-layer document
-|> parents #=> [elem(#foo-second-layer), elem(#foo-top-layer), ...]
+|> parents #=> [elem(#foo-second-layer), elem(#foo-top-layer), ... document]
 ```
 #### children
 Get child nodes.
