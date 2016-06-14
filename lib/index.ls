@@ -40,3 +40,5 @@ module.exports = new class Domf
   set_outer_html: set_outer_html = set \outerHTML
   tag_name: tag_name = get \tagName
   id: id = get \id
+  value: value = get \value
+  click: click = let_ _, \click

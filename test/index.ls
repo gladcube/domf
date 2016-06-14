@@ -1,6 +1,4 @@
-{catch_, $, act, get} = require \glad-functions
-require! <[fs colors]>
-jsdom = require \jsdom
+require! <[fs colors jsdom]>
 domtext =  "
 <h1 style=\"color:#000;\">
 helloworld
@@ -39,17 +37,18 @@ do main = ->
   (require "../lib/index.ls")
   |> obj-to-pairs
   |> map ( ++ jsdom.jsdom domtext |> get \defaultView |> get \document)
-  |> each ([key, func, doc])->
-    (fix (run)-> (assertions, func, doc)->
+  |> map ( ++ require "../lib/index.ls")
+  |> each ([key, func, doc, lib])->
+    (fix (run)-> (assertions, func, doc, lib)->
         | assertions |> is-type \Array |> (not) =>
-          run [assertions], func, doc
+          run [assertions], func, doc, lib
         | _ =>
           (->
             assertions
-            |> each apply _, [func, doc]
-            |> ( .length)
+            |> each apply _, [func, doc, lib]
+            |> length
             |> -> console.log "#key ok. (#it/#it)".green
           ) `catch_` ->
             console.error "#key failed. (#{it.message})".red
-    ) (require "./assertions/index.ls").(key), func, doc
+    ) (require "./assertions/index.ls").(key), func, doc, lib
 module_name = ( .match /(\w+)\.ls/) >> ( .1) >> camelize >> capitalize
