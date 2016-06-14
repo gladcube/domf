@@ -1,5 +1,39 @@
 ## Usage
 
+### index
+
+* [on_](#on_)
+* [parent](#parent)
+* [parents](#parents)
+* [children](#children)
+* [classes](#classes)
+* [has_class](#has_class)
+* [add_class](#add_class)
+* [remove_class](#remove_class)
+* [query](#query)
+* [query_all](#query_all)
+* [create](#create)
+* [attr](#attr)
+* [set_attr](#set_attr)
+* [style](#style)
+* [set_style](#set_style)
+* [append_to](#append_to)
+* [append](#append)
+* [select](#select)
+* [focus](#focus)
+* [blur](#blur)
+* [text](#text)
+* [set_text](#set_text)
+* [html](#html)
+* [set_html](#set_html)
+* [outer_html](#outer_html)
+* [set_outer_html](#set_outer_html)
+* [tag_name](#tag_name)
+* [id](#id)
+* [value](#value)
+* [click](#click)
+
+
 #### on_
 Add eventlistener.
 
@@ -18,7 +52,7 @@ Add eventlistener.
 query "input[name='foo-input-button']" document
 |> on_ \click, -> @value = "button pushed"
 ```
-[LiveScript] (With no lambda using glad-functions. Equivalent to the below. )
+[LiveScript]
 ```livescript
 query "input[name='foo-input-button']" document
 |> (withl lazy set, \value, "button pushed", _ ) >> (apply on_ \click)
@@ -517,4 +551,83 @@ query \#foo-top document
 |> set_outer_html "<div id="foo">this is the content of the element</div>"
 
 #<div id="foo">this is the content of the element</div>
+```
+
+#### tag_name
+Get tag name from the element.
+
+[HTML]
+```HTML
+<div id="foo-top" class="foo-class">
+  <div id="foo-second" class="foo-class-second">
+  foo-second-content
+  </div>
+</div>
+```
+
+[LiveScript]
+```livescript
+query \#foo-top document
+|> tag_name #=> "DIV"
+```
+
+#### id
+Get the id value from the element.
+In case you use with plelude.ls, it should conflict with that. Thus, import like below.
+
+[import]
+```
+{id: id_} = require \domf
+```
+
+[HTML]
+```HTML
+<div id="foo-top" class="foo-class">
+  <div id="foo-second" class="foo-class-second">
+  foo-second-content
+  </div>
+</div>
+```
+
+[LiveScript]
+```livescript
+query \#foo-top document
+|> id #=> "DIV"
+```
+
+#### value
+Get the value from the element.
+
+[HTML]
+```HTML
+<form name="foo-form">
+<input type="text" name="foo-input-text" value="foovalue">
+<input type="button" name="foo-input-button" value="this is foo button">
+</form>
+```
+
+[LiveScript]
+```livescript
+query "input[name='foo-input-text']" document
+|> value
+#=>foovalue
+```
+
+#### click
+Fire click event on the element.
+
+[HTML]
+```HTML
+<form name="foo-form">
+<input type="text" name="foo-input-text" value="foovalue">
+<input type="button" name="foo-input-button" value="this is foo button">
+</form>
+```
+
+[LiveScript]
+```livescript
+query "input[name='foo-input-button']" document
+|> act (withl lazy set, \value, "foo button pushed", _) >> (apply on_ \click)
+|> act click
+|> value #=> "foo button pushed"
 ```
